@@ -1,0 +1,10 @@
+{
+  "name": "Timmie · A life in the North Pacific",
+  "short_name": "Timmie",
+  "description": "An interactive visualisation of the full life and migration of Timmie the humpback whale.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#05080f",
+  "theme_color": "#05080f",
+  "icons": []
+}

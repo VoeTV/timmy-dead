@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects.
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# Single-page app — no extra routes today. We keep this file as a stub so
+# future redirects (e.g. /story -> /, marketing campaigns) have an obvious home.

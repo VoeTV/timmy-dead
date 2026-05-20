@@ -112,6 +112,71 @@ npm run lint       # next.js eslint
 npm run typecheck  # tsc --noEmit
 ```
 
+## Deploying to Cloudflare Pages
+
+The app exports a fully-static `./out/` directory — no server required.
+
+### Option A — Git integration (recommended, auto-deploys on push)
+
+1. Go to [Cloudflare Dashboard → Pages](https://dash.cloudflare.com/?to=/:account/pages) → **Create a project** → **Connect to Git**.
+2. Select the repository `VoeTV/timmy-dead`, branch `main`.
+3. Configure the build:
+
+   | Setting | Value |
+   |---------|-------|
+   | Framework preset | **Next.js (Static HTML Export)** |
+   | Build command | `npm run build` |
+   | Build output directory | `out` |
+   | Root directory | *(leave blank)* |
+
+4. Add one environment variable:
+
+   | Variable | Value |
+   |----------|-------|
+   | `NODE_VERSION` | `20` |
+   | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` *(your custom domain, without trailing slash)* |
+
+5. Click **Save and Deploy**. Done — every `git push` to `main` will redeploy automatically.
+
+### Option B — Manual deploy with Wrangler
+
+```bash
+npm install
+npm run build
+npx wrangler pages deploy out --project-name=timmy-dead
+```
+
+### Connecting a custom domain
+
+1. In the **Cloudflare Pages** project, go to **Custom domains** → **Set up a custom domain**.
+2. Enter your domain (e.g. `timmie.example.com`).
+3. Cloudflare will show you a **CNAME** record to add:
+
+   | Type | Name | Content |
+   |------|------|---------|
+   | `CNAME` | `timmie` (or `@` for apex) | `timmy-dead.pages.dev` |
+
+4. If the domain is **already on Cloudflare** (orange-clouded), the DNS record is added automatically — just confirm.
+5. If the domain is **external**, add the CNAME at your registrar, then come back and click **Verify**.
+6. Cloudflare automatically provisions a free SSL certificate (edge + origin). HTTPS is enforced by the `_headers` file (`Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`).
+
+For an **apex domain** (`example.com` without subdomain): Cloudflare requires the domain's NS to point to Cloudflare. Transfer or add the domain in the Cloudflare dashboard first, then add an `A`-flattened `CNAME` record.
+
+### Production environment variables
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NODE_VERSION` | Yes | Ensures build uses Node 20+ |
+| `NEXT_PUBLIC_SITE_URL` | Yes | Used for canonical URL, OG tags (`https://timmie.example.com`) |
+
+### What the deploy includes
+
+- **Security headers** (`_headers`): HSTS preload, X-Frame-Options DENY, nosniff, strict referrer, Permissions-Policy.
+- **Cache rules**: `/_next/static/*` cached forever (immutable, content-hashed filenames); HTML always revalidates.
+- **SEO**: OpenGraph + Twitter Card meta, canonical, robots.txt, JSON-LD-ready layout.
+- **PWA stub**: `site.webmanifest` for mobile home-screen installs (add icons as needed).
+- **404**: Custom Next.js 404 page (static).
+
 ## Customising the story
 
 All of Timmie's life is defined in `lib/data.ts`. Each event is a typed
