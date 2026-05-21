@@ -5,7 +5,7 @@
   "description": "An interactive premium-quality visualisation of the full life and migration of Timmie the humpback whale.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node -e \"require('fs').statSync('out')\" || (echo 'ERROR: ./out not generated — confirm output:\\\"export\\\" in next.config.mjs' && exit 1)",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
